@@ -14,8 +14,8 @@ namespace BroadcastClient
 {
     public partial class Form1 : Form
     {
-        IPAddress Ip;
-        int Port;
+        const string Ip = "239.0.0.1";
+        const int Port = 2000;
         UdpClient client;
         IPEndPoint point = null;
         public Form1()
@@ -24,45 +24,22 @@ namespace BroadcastClient
             ReceivedRTB.Enabled = false;
             comboBox1.Items.AddRange(new string[] {"All", "Advertisement", "Activities", "Overtime work"});
             comboBox1.SelectedIndex = 0;
+            Connect();
         }
 
-        private void ConnectBtn_Click(object sender, EventArgs e)
+        private void Connect()
         {
-            if (ConnectBtn.Text == "Connect")
+            try
             {
-                if (IPAddress.TryParse(IPTB.Text, out Ip) == false)
-                {
-                    MessageBox.Show("Wrong IP!");
-                    return;
-                }
-                if (int.TryParse(PortTB.Text, out Port) == false)
-                {
-                    MessageBox.Show("Wrong port!");
-                    return;
-                }
-                try
-                {
-                    client = new UdpClient(Port);
-                    client.JoinMulticastGroup(Ip);
-                    ConnectBtn.Text = "Disconnect";
-                }
-                catch
-                {
-                    MessageBox.Show("Not multicast address! Try another one!");
-                    return;
-                }
-                Task.Run(Receive);
+                client = new UdpClient(Port);
+                client.JoinMulticastGroup(IPAddress.Parse(Ip));
             }
-            else
+            catch
             {
-                try
-                {
-                    ConnectBtn.Text = "Connect";
-                    client.DropMulticastGroup(Ip);
-                    client.Close(); 
-                }
-                catch { }
+                MessageBox.Show("Error!");
+                return;
             }
+            Task.Run(Receive);
         }
 
         private void Receive()
@@ -84,6 +61,15 @@ namespace BroadcastClient
                         ReceivedRTB.Text = builder.ToString();
                     }
                 }
+            }
+            catch { }
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            try
+            {
+                client.DropMulticastGroup(IPAddress.Parse(Ip));
             }
             catch { }
         }
