@@ -58,11 +58,21 @@ namespace BroadcastClient
                     var q = builder.ToString().Split('\n');
                     if (q[q.Length-1] ==comboBox1.SelectedItem.ToString()||comboBox1.SelectedItem.ToString()=="All")
                     {
-                        ReceivedRTB.Text = builder.ToString();
+                        if (InvokeRequired)
+                        {
+                            Invoke(new Action(() => ReceivedRTB.Text = builder.ToString()));
+                        }
+                        else
+                        {
+                            ReceivedRTB.Text = builder.ToString();
+                        }
                     }
                 }
             }
-            catch { }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message);
+            }
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
