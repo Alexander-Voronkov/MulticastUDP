@@ -56,13 +56,19 @@ namespace BroadcastClient
                     }
                     while (client.Available > 0);
                     var q = builder.ToString().Split('\n');
-                    if (q[q.Length-1] ==comboBox1.SelectedItem.ToString()||comboBox1.SelectedItem.ToString()=="All")
+                    if (InvokeRequired)
                     {
-                        if (InvokeRequired)
+                        Invoke(new Action(() =>
                         {
-                            Invoke(new Action(() => ReceivedRTB.Text = builder.ToString()));
-                        }
-                        else
+                            if (q[q.Length - 1] == comboBox1.SelectedItem.ToString() || comboBox1.SelectedItem.ToString() == "All")
+                            {
+                                ReceivedRTB.Text = builder.ToString();
+                            }
+                        }));
+                    }
+                    else
+                    {
+                        if (q[q.Length - 1] == comboBox1.SelectedItem.ToString() || comboBox1.SelectedItem.ToString() == "All")
                         {
                             ReceivedRTB.Text = builder.ToString();
                         }
